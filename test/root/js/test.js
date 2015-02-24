@@ -93,10 +93,3 @@ function test()
 			- eval
 	*/
 }
-
-DevelopModule.loadPackage
-(
-	'js/',
-	'mongojs',
-	test
-)
