@@ -94,12 +94,9 @@ function test()
 	*/
 }
 
-PackageLoaderModule.loadPackage
+DevelopModule.loadPackage
 (
 	'js/',
 	'mongojs',
-	function()
-	{
-		console.log('loaded')
-	}
+	test
 )

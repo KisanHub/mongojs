@@ -18,7 +18,7 @@ module.AbstractBsonValue.extend
 
 	function writeBsonAt(writer, offset)
 	{
-		var currentOffset = writer.writeCStringAt(this.regex, currentOffset)
+		var currentOffset = writer.writeCStringAt(this.pattern, currentOffset)
 		return writer.writeCStringAt(this.options, currentOffset)
 	},
 	
