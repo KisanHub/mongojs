@@ -25,5 +25,10 @@ module.AbstractCredential.extend
 		{
 			loginDatabase.authFromHash(userName, authenticationHash, nonceString, couldNotAuthenticateCallback, authenticatedCallback)
 		})
+	},
+	
+	function removeFromCredentialStore(credentialsStore)
+	{
+		credentialsStore.removeCredential(this.databaseName, this.userName)
 	}
 )

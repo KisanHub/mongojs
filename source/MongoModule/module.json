@@ -92,7 +92,8 @@
 				"Credential",
 				"AbstractCredential",
 				"HashedMongoChallengeResponseCredential",
-				"UserNamePasswordMongoChallengeResponseCredential"
+				"UserNamePasswordMongoChallengeResponseCredential",
+				"CredentialsStore"
 			]
 		},
 		"Connection",

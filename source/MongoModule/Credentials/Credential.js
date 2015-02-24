@@ -4,6 +4,7 @@ Copyright © 2015 The developers of mongojs. See the COPYRIGHT file in the top-l
 */
 
 
+var VirtualMethodException = ClassModule.VirtualMethodException
 ClassModule.Object.extend
 (
 	module,
@@ -15,6 +16,11 @@ ClassModule.Object.extend
 	
 	function authenticate(connection, couldNotAuthenticateCallback, authenticatedCallback)
 	{
-		throw new ClassModule.VirtualMethodException()
+		throw new VirtualMethodException()
+	},
+	
+	function removeFromCredentialStore(credentialsStore)
+	{
+		throw new VirtualMethodException()
 	}
 )

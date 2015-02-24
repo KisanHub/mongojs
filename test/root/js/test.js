@@ -3,26 +3,43 @@ This file is part of mongojs. It is subject to the licence terms in the COPYRIGH
 Copyright © 2015 The developers of mongojs. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/KisanHub/mongojs/master/COPYRIGHT.
 */
 
-
 function test()
 {
+	// Settings
+	var sharedComputerSoOnlyKeepForSession = true
+	var databaseName = 'euro2012'
+	var userName = 'raph'
+	var password = 'password'
+	
 	// Imports
+	var CredentialsStore = MongoModule.Credentials.CredentialsStore
 	var Connection = MongoModule.Connection
-	var UserNamePasswordMongoChallengeResponseCredential = MongoModule.Credentials.UserNamePasswordMongoChallengeResponseCredential
 	var StringBsonValue = MongoModule.BsonValues.StringBsonValue
+	
+	// Credentials can be stored per-session or without limit locally
+	var credentialsStore = new CredentialsStore(sharedComputerSoOnlyKeepForSession)
+	var credential = credentialsStore.getHashedMongoChallengeResponseCredential(databaseName, userName)
+	if (credential === null)
+	{
+		// Pop-Up a login window, or use this knowledge to change the UI
+		password = window.prompt('Please enter the MongoDb password for ' + userName, password)
+		credential = credentialsStore.setAndGetHashedMongoChallengeResponseCredential(databaseName, userName, password)
+	}
 	
 	function couldNotAuthenticateCallback(errorCode, errorMessage)
 	{
-		// 18 is auth failed
-		console.log(errorCode)
-		console.log(errorMessage)
+		// errorCode == 18, errorMessage == 'auth failed'
+		console.warn('Unauthenticated')
+		
+		// Remove any invalid credentials
+		credential.removeFromCredentialStore(credentialsStore)
 	}
 	
-	function authenticatedCallback(database)
+	var connection = new Connection('ws://localhost:8081/mongodb/', credential, couldNotAuthenticateCallback, function authenticatedCallback(database)
 	{
 		console.log('Authenticated')
 		
-		// or var collection = connection.database('euro2012').collection('teams')
+		// or var collection = connection.database(databaseName).collection('teams')
 		var collection = database.collection('teams')
 		
 		// we could write collating callbacks, per batch, per certain number of documents, once for all
@@ -76,10 +93,7 @@ function test()
 			
 			return moreAvailable
 		}, 10, 100, 0, 1000)
-		
-	}
-	
-	var connection = new Connection('ws://localhost:8081/mongodb/', new UserNamePasswordMongoChallengeResponseCredential('euro2012', 'raph', 'password'), couldNotAuthenticateCallback, authenticatedCallback)
+	})
 	
 	// TODO: tailable cursors
 	// TODO: CHeck GetMore / Kill
