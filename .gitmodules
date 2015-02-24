@@ -1,0 +1,3 @@
+[submodule "library/classjs"]
+	path = library/classjs
+	url = https://github.com/KisanHub/classjs.git

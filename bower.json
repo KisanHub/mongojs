@@ -1,0 +1,53 @@
+{
+	"name": "mongojs",
+	"description": "A MongoDb WebSockets JavaScript Client for use by browsers. Suitable for MongoDb 2.6+",
+	"license":
+	[
+		"MIT"
+	],
+	"homepage": "https://github.com/kisanhub/mongojs",
+	"repository":
+	{
+		"type": "git",
+		"url": "git://github.com/kisanhub/mongojs.git"
+	},
+	"keywords":
+	[
+		"mongo",
+		"client",
+		"mongodb",
+		"websockets",
+		"websocket"
+	],
+	"authors":
+	[
+		{
+			"name": "KisanHub",
+			"email": "sachin@kisanhub.com"
+		},
+		{
+			"name": "Raphael Cohn",
+			"email": "raphael.cohn@stormmq.com"
+		}
+	],
+	"main":
+	[
+		"output/MongoModule.js"
+	],
+	"ignore":
+	[
+		"library",
+		"miscellany",
+		"source",
+		"test",
+		"tools"
+	],
+	"dependencies":
+	{
+		"classjs": "https://github.com/kisanhub/classjs.git"
+	},
+	"devDependencies":
+	{
+		"developjs": "https://github.com/kisanhub/developjs.git"
+	}
+}

@@ -1,0 +1,1 @@
+../../../library/classjs/tools/developjs/source/DevelopModule/DevelopModule.js
