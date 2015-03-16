@@ -26,6 +26,8 @@ Of course, there are some activities that would stay outside of the usages of [m
 
 Yes, there are, but REST is a very inefficient approach, with many TCP connections being created and destroyed (with higher bandwidth and resource cost, particularly when using TLS), and certainly isn't suitable for many scenarios. With an efficient replacement for [websockify], or integration of [libwebsockets] into [mongoDB], then an approach using [mongojs] becomes very efficient indeed.
 
+### You check in the build output
+Yep, this is to make it simpler to work with the popular, but flawed, 'package' manager that is [bower]. Of course, we could use GitHub releases, but then we have to post-release check in a new `bower.json` file… which is the same as post-build checking in the build output.
 
 ## Example
 
