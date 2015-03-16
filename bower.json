@@ -32,7 +32,7 @@
 	],
 	"main":
 	[
-		"output/MongoModule.js"
+		"release/MongoModule.js"
 	],
 	"ignore":
 	[
