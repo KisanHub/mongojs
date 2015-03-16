@@ -2,7 +2,7 @@
 
 [mongojs] is a browser client for [mongoDB] 2.6+ which uses [WebSockets] and is written in JavaScript. It is MIT licensed. It is designed to from you from the tyranny of excessive MVC frameworks, and let you design highly-scalable, client-orientated applications.
 
-A [bower] JSON file is available at XXXXX.
+To install using [bower], do `bower install KisanHub/mongojs` and then look at the contents of `bower_components/mongojs/release`.
 
 ## Why?
 
