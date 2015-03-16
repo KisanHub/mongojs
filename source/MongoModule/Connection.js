@@ -16,6 +16,8 @@ var DeleteMessage = MongoModule.Messages.DeleteMessage
 var DocumentBsonValue = MongoModule.BsonValues.DocumentBsonValue
 var ObjectIdBsonValue = MongoModule.BsonValues.ObjectIdBsonValue
 
+var fromStrictJavascript = MongoModule.BsonValues.fromStrictJavascript
+
 var readMessage = MongoModule.Messages.Message.readMessage
 
 
@@ -185,7 +187,7 @@ ClassModule.Object.extend
 		return this.sendQuery(resultHandler, databaseName, '$cmd', false, 0, -1, null, unwrappedCommandDocument)
 	},
 	
-	function sendQuery(resultHandler, databaseName, collectionName, isSlaveOk, numberToSkipInt32, numberToReturnInt32, returnFieldsSelectorDocument, unwrappedQueryDocument)
+	function sendQuery(resultHandler, databaseName, collectionName, isSlaveOk, numberToSkipInt32, numberToReturnInt32, returnFieldsSelectorDocument, queryDocument)
 	{
 		// same for every kind of message (eg OP_INSERT)
 		var fullCollectionName = databaseName + '.' + collectionName
@@ -208,15 +210,13 @@ ClassModule.Object.extend
 				
 				numberToSkipInt32,
 				numberToReturnInt32,
-				unwrappedQueryDocument instanceof DocumentBsonValue ? unwrappedQueryDocument : new DocumentBsonValue(unwrappedQueryDocument),
-				(returnFieldsSelectorDocument === null) ? null : (returnFieldsSelectorDocument instanceof DocumentBsonValue ? returnFieldsSelectorDocument : new DocumentBsonValue(returnFieldsSelectorDocument))
+				fromStrictJavascript(queryDocument),
+				(returnFieldsSelectorDocument === null) ? null : fromStrictJavascript(returnFieldsSelectorDocument)
 			)
 		)
 	},
 	
-	// WriteConcern to apply
-	
-	function sendInsert(databaseName, collectionName, continueOnError, unwrappedDocuments)
+	function sendInsert(databaseName, collectionName, continueOnError, insertDocuments)
 	{
 		var fullCollectionName = databaseName + '.' + collectionName
 		var requestIdInt32 = this.__resultHandlerTuples.nextRequestId()
@@ -235,27 +235,24 @@ ClassModule.Object.extend
 				flagsInt32,
 				fullCollectionName,
 				
-				unwrappedDocuments.map(function(unwrappedDocument)
+				insertDocuments.map(function addObjectIdToInsertDocument(insertDocument)
 				{
 					var objectId = ObjectIdBsonValue.generateNewObjectId()
-					var result
-					if (unwrappedDocument instanceof DocumentBsonValue)
+					if (insertDocument instanceof DocumentBsonValue)
 					{
-						result = unwrappedDocument
-						result.value._id = objectId
+						insertDocument.value._id = objectId
 					}
 					else
 					{
-						unwrappedDocument._id = objectId
-						result = new DocumentBsonValue(unwrappedDocument)
+						insertDocument._id = objectId.toStrictJavaScriptValue()
 					}
-					return result
+					return fromStrictJavascript(insertDocument)
 				})
 			)
 		)
 	},
 	
-	function sendUpdate(databaseName, collectionName, isUpsert, isMulti, unwrappedFilterDocument, unwrappedUpdateDocument)
+	function sendUpdate(databaseName, collectionName, isUpsert, isMulti, filterDocument, updateDocument)
 	{
 		var fullCollectionName = databaseName + '.' + collectionName
 		var requestIdInt32 = this.__resultHandlerTuples.nextRequestId()
@@ -283,13 +280,13 @@ ClassModule.Object.extend
 				fullCollectionName,
 				flagsInt32,
 				
-				unwrappedFilterDocument instanceof DocumentBsonValue ? unwrappedFilterDocument : new DocumentBsonValue(unwrappedFilterDocument),
-				unwrappedUpdateDocument instanceof DocumentBsonValue ? unwrappedUpdateDocument : new DocumentBsonValue(unwrappedUpdateDocument)
+				fromStrictJavascript(filterDocument),
+				fromStrictJavascript(updateDocument)
 			)
 		)
 	},
 	
-	function sendDelete(databaseName, collectionName, isSingleRemove, unwrappedFilterDocument)
+	function sendDelete(databaseName, collectionName, isSingleRemove, filterDocument)
 	{
 		var fullCollectionName = databaseName + '.' + collectionName
 		var requestIdInt32 = this.__resultHandlerTuples.nextRequestId()
@@ -309,7 +306,7 @@ ClassModule.Object.extend
 				fullCollectionName,
 				flagsInt32,
 				
-				unwrappedFilterDocument instanceof DocumentBsonValue ? unwrappedFilterDocument : new DocumentBsonValue(unwrappedFilterDocument)
+				fromStrictJavascript(filterDocument)
 			)
 		)
 	},

@@ -15,64 +15,62 @@ ClassModule.Object.extend
 		this.collectionName = collectionName
 	},
 	
-	// Review InsertMessage.class for code that handles payloads > max message size
-	function insert(continueOnError, callback, unwrappedDocuments)
+	// pass -1 for findOne()
+	// pass null for returnFieldsSelectorDocument if not wanted
+	function find(filterDocument, returnFieldsSelectorDocument, callback, batchSize, limit, skip, maximumExectionTimeInMilliseconds)
 	{
-		// handle array or varargs
-		var actualUnwrappedDocuments
+		this.database.find(this.collectionName, filterDocument, returnFieldsSelectorDocument, callback, batchSize, limit, skip, maximumExectionTimeInMilliseconds)
+		return this
+	},
+	
+	function insert(continueOnError, callback, insertDocuments)
+	{
+		var actualInsertDocuments
 		if (arguments.length == 3)
 		{
-			if (unwrappedDocuments instanceof Array)
+			if (insertDocuments instanceof Array)
 			{
-				actualUnwrappedDocuments = unwrappedDocuments
+				actualInsertDocuments = insertDocuments
 			}
 			else
 			{
-				actualUnwrappedDocuments = [unwrappedDocuments]
+				actualInsertDocuments = [insertDocuments]
 			}
 		}
 		else
 		{
-			actualUnwrappedDocuments = Array.prototype.slice.call(arguments, 2)
+			actualInsertDocuments = Array.prototype.slice.call(arguments, 2)
 		}
-		this.database.insertDocuments(this.collectionName, continueOnError, callback, actualUnwrappedDocuments)
+		this.database.insert(this.collectionName, continueOnError, callback, actualInsertDocuments)
 		return this
 	},
 	
-	function update(isUpsert, isMulti, unwrappedFilterDocument, callback, unwrappedDocuments)
+	function update(isUpsert, isMulti, filterDocument, callback, updateDocuments)
 	{
-		// handle array or varargs
-		var actualUnwrappedDocuments
+		var actualUpdateDocuments
 		if (arguments.length == 5)
 		{
-			if (unwrappedDocuments instanceof Array)
+			if (updateDocuments instanceof Array)
 			{
-				actualUnwrappedDocuments = unwrappedDocuments
+				actualUpdateDocuments = updateDocuments
 			}
 			else
 			{
-				actualUnwrappedDocuments = [unwrappedDocuments]
+				actualUpdateDocuments = [updateDocuments]
 			}
 		}
 		else
 		{
-			actualUnwrappedDocuments = Array.prototype.slice.call(arguments, 4)
+			actualUpdateDocuments = Array.prototype.slice.call(arguments, 4)
 		}
 
-		this.database.updateMatchingDocumentsWith(this.collectionName, isUpsert, isMulti, unwrappedFilterDocument, callback, actualUnwrappedDocuments)
+		this.database.update(this.collectionName, isUpsert, isMulti, filterDocument, callback, actualUpdateDocuments)
 		return this
 	},
 	
-	function deleteMatching(isSingleRemove, callback, unwrappedFilterDocument)
+	function deleteMatching(isSingleRemove, callback, filterDocument)
 	{
-		this.database.deleteMatchingDocuments(this.collectionName, isSingleRemove, callback, unwrappedFilterDocument)
-		return this
-	},
-	
-	// find() and findOne()
-	function find(unwrappedFilterDocument, returnFieldsSelectorDocument, callback, batchSize, limit, skip, maximumExectionTimeInMilliseconds)
-	{
-		this.database.findDocuments(this.collectionName, unwrappedFilterDocument, returnFieldsSelectorDocument, callback, batchSize, limit, skip, maximumExectionTimeInMilliseconds)
+		this.database.deleteMatching(this.collectionName, isSingleRemove, callback, filterDocument)
 		return this
 	}
 )

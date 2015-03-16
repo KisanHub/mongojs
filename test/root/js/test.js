@@ -7,6 +7,7 @@ function test()
 {
 	// Settings
 	var sharedComputerSoOnlyKeepForSession = true
+	var webSocketsUrl = 'ws://localhost:8081/mongodb/'
 	var databaseName = 'euro2012'
 	var userName = 'raph'
 	var password = 'password'
@@ -35,7 +36,7 @@ function test()
 		credential.removeFromCredentialStore(credentialsStore)
 	}
 	
-	var connection = new Connection('ws://localhost:8081/mongodb/', credential, couldNotAuthenticateCallback, function authenticatedCallback(database)
+	var connection = new Connection(webSocketsUrl, credential, couldNotAuthenticateCallback, function authenticatedCallback(database)
 	{
 		console.log('Authenticated')
 		

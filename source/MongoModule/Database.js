@@ -20,6 +20,8 @@ var bsonBoolean = BooleanBsonValue.bsonBoolean
 var BsonFalse = BooleanBsonValue.BsonFalse
 var BsonTrue = BooleanBsonValue.BsonTrue
 
+var fromStrictJavascript = MongoModule.BsonValues.fromStrictJavascript
+
 var ResultHandlers = MongoModule.ResultHandlers
 var NonceCommandResultHandler = ResultHandlers.NonceCommandResultHandler
 var AuthCommandResultHandler = ResultHandlers.AuthCommandResultHandler
@@ -111,13 +113,11 @@ ClassModule.Object.extend
 		return this.sendCommand(new GetLastErrorCommandResultHandler(callback), command)
 	},
 	
-	// pass -1 for findOne()
-	// pass null for returnFieldsSelectorDocument if not wanted
-	function findDocuments(collectionName, unwrappedFilterDocument, returnFieldsSelectorDocument, callback, batchSize, limit, skip, maximumExectionTimeInMilliseconds)
+	function find(collectionName, filterDocument, returnFieldsSelectorDocument, callback, batchSize, limit, skip, maximumExectionTimeInMilliseconds)
 	{
 		var isSlaveOk = true
 		var queryDocument = {}
-		queryDocument['$query'] = new DocumentBsonValue(unwrappedFilterDocument)
+		queryDocument['$query'] = fromStrictJavascript(filterDocument)
 		
 		if (maximumExectionTimeInMilliseconds && maximumExectionTimeInMilliseconds > 0)
 		{
@@ -125,6 +125,41 @@ ClassModule.Object.extend
 		}
 		
 		this.connection.sendQuery(new QueryResultsHandler(callback, batchSize, limit), this.databaseName, collectionName, isSlaveOk, skip, batchSize, returnFieldsSelectorDocument, queryDocument)
+		return this
+	},
+	
+	function insert(collectionName, continueOnError, callback, insertDocuments)
+	{
+		var connection = this.connection
+		connection.sendInsert(this.databaseName, collectionName, continueOnError, insertDocuments)
+		connection.getLastError(this, callback)
+		return this
+	},
+	
+	function update(collectionName, isUpsert, isMulti, filterDocument, callback, updateDocuments)
+	{
+		var connection = this.connection
+		var databaseName = this.databaseName
+		var self = this
+		updateDocuments.forEach(function eachUpdate(updateDocument)
+		{
+			connection.sendUpdate(databaseName, collectionName, isUpsert, isMulti, filterDocument, updateDocument)
+			connection.getLastError(self, callback)
+		})
+		return this
+	},
+	
+	function deleteMatching(collectionName, isSingleRemove, callback, filterDocument)
+	{
+		var connection = this.connection
+		connection.sendDelete(this.databaseName, collectionName, isSingleRemove, filterDocument)
+		connection.getLastError(this, callback)
+		return this
+	},
+	
+	function sendCommand(resultHandler, commandDocument)
+	{
+		this.connection.sendCommand(resultHandler, this.databaseName, commandDocument)
 		return this
 	},
 	
@@ -142,74 +177,6 @@ ClassModule.Object.extend
 			}
 		}
 		return this.findDocuments('system.namespaces', {}, null, callback, batchSize, limit, maximumExectionTimeInMilliseconds)
-	},
-	
-	function sendCommand(resultHandler, unwrappedCommandDocument)
-	{
-		this.connection.sendCommand(resultHandler, this.databaseName, unwrappedCommandDocument)
-		return this
-	},
-	
-	// Review InsertMessage.class for code that handles payloads > max message size
-	function insertDocuments(collectionName, continueOnError, callback, unwrappedDocuments)
-	{
-		// handle array or varargs
-		var actualUnwrappedDocuments
-		if (arguments.length == 4)
-		{
-			if (unwrappedDocuments instanceof Array)
-			{
-				actualUnwrappedDocuments = unwrappedDocuments
-			}
-			else
-			{
-				actualUnwrappedDocuments = [unwrappedDocuments]
-			}
-		}
-		else
-		{
-			actualUnwrappedDocuments = Array.prototype.slice.call(arguments, 3)
-		}
-		this.connection.sendInsert(this.databaseName, collectionName, continueOnError, actualUnwrappedDocuments)
-		this.connection.getLastError(this, callback)
-		return this
-	},
-	
-	function updateMatchingDocumentsWith(collectionName, isUpsert, isMulti, unwrappedFilterDocument, callback, unwrappedDocuments)
-	{
-		// handle array or varargs
-		var actualUnwrappedDocuments
-		if (arguments.length == 6)
-		{
-			if (unwrappedDocuments instanceof Array)
-			{
-				actualUnwrappedDocuments = unwrappedDocuments
-			}
-			else
-			{
-				actualUnwrappedDocuments = [unwrappedDocuments]
-			}
-		}
-		else
-		{
-			actualUnwrappedDocuments = Array.prototype.slice.call(arguments, 5)
-		}
-		var connection = this.connection
-		var databaseName = this.databaseName
-		var self = this
-		actualUnwrappedDocuments.forEach(function(unwrappedDocument)
-		{
-			connection.sendUpdate(databaseName, collectionName, isUpsert, isMulti, unwrappedFilterDocument, unwrappedDocument)
-			connection.getLastError(self, callback)
-		})
-		return this
-	},
-	
-	function deleteMatchingDocuments(collectionName, isSingleRemove, callback, unwrappedFilterDocument)
-	{
-		this.connection.sendDelete(this.databaseName, collectionName, isSingleRemove, unwrappedFilterDocument)
-		this.connection.getLastError(this, callback)
-		return this
 	},
 	
 	// 3.0
@@ -327,42 +294,6 @@ ClassModule.Object.extend
 		})
 	}
 )
-
-/*
-	Also DB object has methods like dbStats that aren't elsewhere...
-
-	Read Operations
-		AggregateExplain
-		Aggregate
-		Count
-		Distinct
-		
-	
-	Write Operations
-		AggregateToCollection
-		CreateCollection X
-		CreateIndex X
-		CreateUser X
-		
-		DropCollection X
-		DropDatabase X
-		DropIndex X
-		DropUser X
-	
-	BaseWriteOperation
-		Delete
-	
-	BaseWriteCommandMessage
-		DeleteCommandMessage
-		InsertCommandMessage
-		UpdateCommandMessage
-		// all operate on $cmd
-		// all OP_QUERY
-	
-	CommandReadOperation (used for Explainable)
-	
-	CommandWriteOperation
-*/
 
 // storageEngine ommitted
 // Use null for unwanted fields
