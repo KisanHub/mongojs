@@ -2,7 +2,7 @@
 
 [mongojs] is a browser client for [mongoDB] 2.6+ which uses [WebSockets] and is written in JavaScript. It is MIT licensed. It is designed to from you from the tyranny of excessive MVC frameworks, and let you design highly-scalable, client-orientated applications.
 
-To install using [bower], do `bower install KisanHub/mongojs` and then look at the contents of `bower_components/mongojs/release`.
+To install using [bower], do `bower install KisanHub/mongojs` and then look at the contents of `bower_components/mongojs/release`. If checking out from git, remember to do `git submodule update --init --recursive`.
 
 ## Why?
 
@@ -27,7 +27,7 @@ Of course, there are some activities that would stay outside of the usages of [m
 Yes, there are, but REST is a very inefficient approach, with many TCP connections being created and destroyed (with higher bandwidth and resource cost, particularly when using TLS), and certainly isn't suitable for many scenarios. With an efficient replacement for [websockify], or integration of [libwebsockets] into [mongoDB], then an approach using [mongojs] becomes very efficient indeed.
 
 ### You check in the build output
-Yep, this is to make it simpler to work with the popular, but flawed, 'package' manager that is [bower]. Of course, we could use GitHub releases, but then we have to post-release check in a new `bower.json` file… which is the same as post-build checking in the build output.
+Yep, this is to make it simpler to work with the popular, but flawed, 'package' manager that is [bower]. Of course, we could use GitHub releases, but then we have to post-release check in a new `bower.json` file… which is the almost the same as post-build checking in the build output, but with a need to then edit `bower.json` too!
 
 ## Example
 
@@ -343,6 +343,14 @@ You can add methods to instances of these value objects should you wish. In addi
 
 To convert from a JavaScript object to `BsonValue`. Also copes with mixed (JavaScript and Bson) objects and with added methods.
 
+## Requests  for Help
+
+* libwebsockets
+* Adding more auths
+* [mongoDB] 3.0 support
+* More admin functions
+* Trying to break the library to expose security flaws
+
 ## Hacking on the Source
 
 To reduce the amount of boilerplate required, and to make it possible to actually write [mongojs], the code is broken down into files. Each file is organised into its respective namespace. A file may be either a major public function, or a class. Classes are implemented using [classjs]. The definitions in each file are private unless exported. As a result, `function xxx()` definitions and `var x = ` definitions are file-private.
@@ -351,13 +359,13 @@ The files are then concatenated together as part of the build process. This uses
 
 To test the code without concatenation, [developjs] provides an AJAX driven class-loader, `DevelopModule`. You can see how this works in `test/root/index.html`. In essence, this lets one load either a production-quality, concatenated javascript file called `XXXXX.package.js`, or, in the event this is not found, load a set of `Module`s defined in `XXXXX.package.json` (where `XXXXX` is a package name). Each 'package' consists of one or more `Module`s. Each major group of classes is called a `Module`; one example is `MongoModule`, another is a dependency, `ClassModule`. `Module`s typically are conventionally named the same as a top-level namespace. Each `Module`, in its top-level namespace folder, contains a file called `module.json`. This defines, in precise order, which files are to be concatenated.
 
-## Requests  for Help
+## Dependencies
 
-* libwebsockets
-* Adding more auths
-* [mongoDB] 3.0 support
-* More admin functions
-* Trying to break the library to expose security flaws
+All the dependencies listed are included as git submodules:-
+
+* [classjs]
+* [developjs]
+* [shellfire]
 
 ## Compatibility
 
