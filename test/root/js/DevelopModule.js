@@ -1,1 +1,1 @@
-../../../library/classjs/tools/developjs/source/DevelopModule/DevelopModule.js
+../../../library/classjs/tools/developjs/release/DevelopModule.js
