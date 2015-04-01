@@ -1,0 +1,1 @@
+../library/classjs/release/ClassModule.js

@@ -1,0 +1,1 @@
+../../tools/developjs/release/DevelopModule.js
